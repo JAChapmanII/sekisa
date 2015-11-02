@@ -5,7 +5,6 @@
 #include <string>
 #include <map>
 #include <utility>
-#include "variable.hpp"
 
 namespace util {
 	template<typename T> T split(std::string str, std::string on = " \t\r\n");
@@ -13,7 +12,6 @@ namespace util {
 	template<typename T> std::string join(T strsB, T strsE, std::string with = ", ");
 	template<typename T> std::string join(T strs, std::string with = ", ");
 	std::string join(std::vector<std::string> strs, std::string with = ", ");
-	std::string join(std::vector<Variable> strs, std::string with = ", ");
 
 	template<typename T> std::vector<T> subvector(std::vector<T> vec,
 			size_t s, size_t n);
