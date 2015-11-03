@@ -1,6 +1,14 @@
+#include <typeinfo>
 #include "err.hpp"
 
 namespace zidcu {
+	template<> int Result::get<int>(int idx);
+	template<> sqlite_int64 Result::get<sqlite_int64>(int idx);
+	template<> std::string Result::get<std::string>(int idx);
+	extern template int Result::get<int>(int idx);
+	extern template sqlite_int64 Result::get<sqlite_int64>(int idx);
+	extern template std::string Result::get<std::string>(int idx);
+
 	template<typename... Ts>
 			Result Database::execute(std::string sql, Ts... args) {
 		auto &statement = (*this)[sql];
@@ -50,7 +58,7 @@ namespace zidcu {
 	}
 
 	template<typename T> T Result::get(int) {
-		throw make_except("unexpected type");
+		throw make_except(std::string{"unexpected type: \""} + typeid(T).name() + "\"");
 	}
 }
 
