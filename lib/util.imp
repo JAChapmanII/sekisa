@@ -22,7 +22,7 @@ template<typename T> std::string util::join(T strsB, T strsE, std::string with) 
 		return "";
 	std::string res;
 	for(auto i = strsB; i != strsE; ++i)
-		res += (*i) + with;
+		res += (std::string)((*i) + with);
 	return res.substr(0, res.length() - with.length());
 }
 
