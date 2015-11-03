@@ -1,3 +1,4 @@
 *.o
 
+libsekisa.so
 web_ex
