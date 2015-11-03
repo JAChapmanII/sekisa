@@ -28,7 +28,7 @@ namespace web {
 			// TODO: escaping
 			postParameters.push_back(param.first + "=" + param.second);
 
-		postData = util::join(postParameters);
+		postData = util::join(postParameters, "&");
 
 
 		curl = curl_easy_init();

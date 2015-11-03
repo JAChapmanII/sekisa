@@ -6,7 +6,7 @@ using std::endl;
 
 int main(int, char **) {
 	auto response = web::post("https://serv2.pink/api/umiki/v1", {
-			{ "api_key", "bad" }
+			{ "api_key", "bad" }, { "content", "hello!" }
 		});
 
 	cout << "==== HTTP CODE ====" << endl;
