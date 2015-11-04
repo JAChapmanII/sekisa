@@ -10,6 +10,7 @@ using std::vector;
 #include "util.hpp"
 
 namespace web {
+	string escape(string str);
 	size_t writeCallback(void *data, size_t size, size_t memb, void *userdata);
 	size_t headerCallback(void *data, size_t size, size_t memb, void *userdata);
 
@@ -25,8 +26,8 @@ namespace web {
 		// TODO: escaping
 		vector<string> postParameters{};
 		for(auto &param : params)
-			// TODO: escaping
-			postParameters.push_back(param.first + "=" + param.second);
+			// TODO: better escaping
+			postParameters.push_back(escape(param.first) + "=" + escape(param.second));
 
 		postData = util::join(postParameters, "&");
 
@@ -48,11 +49,18 @@ namespace web {
 		curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, headerCallback);
 		curl_easy_setopt(curl, CURLOPT_HEADERDATA, &response);
 
+		curl_slist *headers{nullptr};
+		headers = curl_slist_append(headers, "Expect: ");
+
+		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
 		res = curl_easy_perform(curl);
 		if(res != CURLE_OK) {
 			// res is not an HTTP response code, but an error code
 			response.code = -res;
 			// TODO: throw?
+			curl_slist_free_all(headers);
+			curl_easy_cleanup(curl);
 			return response;
 		}
 
@@ -60,9 +68,26 @@ namespace web {
 		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response.code);
 
 		// TODO: RAII?
+		curl_slist_free_all(headers);
 		curl_easy_cleanup(curl);
 
 		return response;
+	}
+
+	string escape(string str) {
+		string res{""};
+		for(char c : str)
+			switch(c) {
+				case '&':
+					res += "%26";
+					break;
+				case '=':
+					res += "%3D";
+					break;
+				default:
+					res += c;
+			}
+		return res;
 	}
 
 	size_t writeCallback(void *data, size_t size, size_t memb, void *userdata) {
