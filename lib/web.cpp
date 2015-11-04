@@ -9,6 +9,53 @@ using std::vector;
 #include "err.hpp"
 #include "util.hpp"
 
+struct CURLWrapper {
+	CURLWrapper() {
+		curl = curl_easy_init();
+		if(!curl)
+			throw make_except("curl_easy_init failed");
+
+		this->setHeader("Expect", "");
+	}
+	~CURLWrapper() {
+		if(headers)
+			curl_slist_free_all(headers);
+		if(curl)
+			curl_easy_cleanup(curl);
+	}
+
+	template<typename T>
+	CURLcode setopt(CURLoption option, T parameter) {
+		return curl_easy_setopt(curl, option, parameter);
+	}
+
+	void setHeader(string header, string value) {
+		auto combined = header + ": " + value;
+		headers = curl_slist_append(headers, combined.c_str());
+	}
+
+	CURLcode perform() {
+		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+		return curl_easy_perform(curl);
+	}
+
+	long getCode() {
+		long code{-1};
+		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
+		return code;
+	}
+
+	CURL *curl{nullptr};
+	curl_slist *headers{nullptr};
+};
+
+struct CURLHeaders {
+	CURLHeaders() {
+	}
+	~CURLHeaders() {
+	}
+};
+
 namespace web {
 	string escape(string str);
 	size_t writeCallback(void *data, size_t size, size_t memb, void *userdata);
@@ -17,8 +64,6 @@ namespace web {
 	// TODO: request headers?
 	// TODO: timeout/abort?
 	Response post(Uri uri, Parameters params) {
-		CURL *curl{nullptr};
-		CURLcode res{CURLE_OK};
 		Response response{};
 
 		// TODO: make Parameters a real struct, add this method?
@@ -31,46 +76,29 @@ namespace web {
 
 		postData = util::join(postParameters, "&");
 
+		CURLWrapper curl{};
+		curl.setopt(CURLOPT_USERAGENT, "sekisa/0.0");
+		curl.setopt(CURLOPT_URL, uri.c_str());
 
-		curl = curl_easy_init();
-		if(!curl)
-			throw make_except("curl_easy_init failed");
+		curl.setopt(CURLOPT_POST, 1L);
+		curl.setopt(CURLOPT_POSTFIELDS, postData.c_str());
+		curl.setopt(CURLOPT_POSTFIELDSIZE, postData.size());
 
-		curl_easy_setopt(curl, CURLOPT_USERAGENT, "sekisa/0.0");
-		curl_easy_setopt(curl, CURLOPT_URL, uri.c_str());
+		curl.setopt(CURLOPT_WRITEFUNCTION, writeCallback);
+		curl.setopt(CURLOPT_WRITEDATA, &response);
 
-		curl_easy_setopt(curl, CURLOPT_POST, 1L);
-		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postData.c_str());
-		curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, postData.size());
+		curl.setopt(CURLOPT_HEADERFUNCTION, headerCallback);
+		curl.setopt(CURLOPT_HEADERDATA, &response);
 
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
-		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-
-		curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, headerCallback);
-		curl_easy_setopt(curl, CURLOPT_HEADERDATA, &response);
-
-		curl_slist *headers{nullptr};
-		headers = curl_slist_append(headers, "Expect: ");
-
-		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-
-		res = curl_easy_perform(curl);
+		auto res = curl.perform();
 		if(res != CURLE_OK) {
 			// res is not an HTTP response code, but an error code
 			response.code = -res;
 			// TODO: throw?
-			curl_slist_free_all(headers);
-			curl_easy_cleanup(curl);
 			return response;
 		}
 
-		// grab actual HTTP response code
-		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response.code);
-
-		// TODO: RAII?
-		curl_slist_free_all(headers);
-		curl_easy_cleanup(curl);
-
+		response.code = curl.getCode();
 		return response;
 	}
 
