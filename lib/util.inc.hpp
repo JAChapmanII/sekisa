@@ -88,4 +88,3 @@ template<typename K, typename V>
 	return false;
 }
 
-// vim: ft=cpp:

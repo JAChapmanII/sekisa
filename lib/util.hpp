@@ -57,6 +57,6 @@ namespace util {
 	}
 }
 
-#include "util.imp"
+#include "util.inc.hpp"
 
 #endif // UTIL_HPP
