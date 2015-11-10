@@ -17,17 +17,31 @@ template<typename T> T util::split(std::string str, std::string on) {
 		fields.push(str);
 	return fields;
 }
-template<typename T> std::string util::join(T strsB, T strsE, std::string with) {
-	if(strsE == strsB) // TODO: begin after end?
-		return "";
-	std::string res;
-	for(auto i = strsB; i != strsE; ++i)
-		res += (std::string)((*i) + with);
-	return res.substr(0, res.length() - with.length());
+
+template<typename T> T util::noop(T t) { return t; }
+
+template<typename It> std::string util::join(
+		It strsB, It strsE, std::string with) {
+	return util::join(strsB, strsE, with, noop<decltype(*strsB)>);
+}
+template<typename C> std::string util::join(C strs, std::string with) {
+	return util::join(std::begin(strs), std::end(strs), with);
 }
 
-template<typename T> std::string util::join(T strs, std::string with) {
-	return util::join(begin(strs), end(strs), with);
+template<typename It, typename F> std::string util::join(
+		It strsB, It strsE, std::string with, F func) {
+	if(strsE == strsB) // TODO: begin after end?
+		return "";
+
+	std::string res{""};
+	for(auto i = strsB; i != strsE; ++i)
+		res += (std::string)(func(*i)) + with;
+
+	return res.substr(0, res.length() - with.length());
+}
+template<typename C, typename F> std::string util::join(
+		C strs, std::string with, F func) {
+	return util::join(std::begin(strs), std::end(strs), with, func);
 }
 
 template<typename T> std::vector<T> util::subvector(std::vector<T> vec,

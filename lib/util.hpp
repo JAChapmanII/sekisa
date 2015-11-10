@@ -9,9 +9,21 @@
 namespace util {
 	template<typename T> T split(std::string str, std::string on = " \t\r\n");
 	std::vector<std::string> split(std::string str, std::string on = " \t\r\n");
-	template<typename T> std::string join(T strsB, T strsE, std::string with = ", ");
-	template<typename T> std::string join(T strs, std::string with = ", ");
-	std::string join(std::vector<std::string> strs, std::string with = ", ");
+
+	// join range of arbitrary T into a string (uses <<)
+	template<typename It>
+		std::string join(It strsB, It strsE, std::string with = ", ");
+	// join an entire container C into a string (uses <<)
+	template<typename C> std::string join(C strs, std::string with = ", ");
+
+	template<typename T> T noop(T t);
+
+	// same as above, but transforms all elements with F first
+	template<typename It, typename F>
+		std::string join(It strsB, It strsE, std::string with, F func);
+	template<typename C, typename F>
+		std::string join(C strs, std::string with, F func);
+	// TODO: get with to default to something?
 
 	template<typename T> std::vector<T> subvector(std::vector<T> vec,
 			size_t s, size_t n);

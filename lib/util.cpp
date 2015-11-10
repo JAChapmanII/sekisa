@@ -23,15 +23,6 @@ vector<string> util::split(string str, string on) {
 	return fields;
 }
 
-string util::join(vector<string> strs, string with) {
-	if(strs.empty())
-		return "";
-	string res;
-	for(auto str : strs)
-		res += str + with;
-	return res.substr(0, res.length() - with.length());
-}
-
 string util::trim(string str, string what) {
 	size_t firstNotOf = str.find_first_not_of(what);
 	if(firstNotOf == string::npos)
