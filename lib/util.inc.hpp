@@ -1,23 +1,6 @@
 #include <sstream>
 #include <algorithm>
 
-template<typename T> T util::split(std::string str, std::string on) {
-	T fields;
-	// there are no separators
-	if(str.find_first_of(on) == std::string::npos) {
-		fields.push_back(str);
-		return fields;
-	}
-	size_t fsep = 0;
-	while((fsep = str.find_first_of(on)) != std::string::npos) {
-		fields.push(str.substr(0, fsep));
-		str = str.substr(fsep + 1);
-	}
-	if(!str.empty())
-		fields.push(str);
-	return fields;
-}
-
 template<typename T> T util::noop(T t) { return t; }
 
 template<typename It> std::string util::join(

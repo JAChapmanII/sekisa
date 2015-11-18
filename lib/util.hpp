@@ -7,7 +7,7 @@
 #include <utility>
 
 namespace util {
-	template<typename T> T split(std::string str, std::string on = " \t\r\n");
+	// TODO: add keep empty option? add filter, with default not empty?
 	std::vector<std::string> split(std::string str, std::string on = " \t\r\n");
 
 	// join range of arbitrary T into a string (uses <<)
