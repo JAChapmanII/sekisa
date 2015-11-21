@@ -35,6 +35,17 @@ namespace util {
 	bool startsWith(std::string str, std::string prefix);
 	bool endsWith(std::string str, std::string suffix);
 
+	namespace charset {
+		extern std::string lower;
+		extern std::string upper;
+		extern std::string alpha;
+		extern std::string num;
+		extern std::string alnum;
+	}
+
+	char randomCharacter(std::string set = charset::alnum);
+	std::string randomString(long length = 32, std::string set = charset::alnum);
+
 	template<typename T> T fromString(std::string str);
 	template<typename T> std::string asString(T val);
 

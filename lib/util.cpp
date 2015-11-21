@@ -3,6 +3,20 @@ using std::vector;
 using std::string;
 #include <unistd.h>
 
+#include <random>
+using std::random_device;
+using std::default_random_engine;
+using std::uniform_int_distribution;
+
+string util::charset::lower = "abcdefghijklmnopqrstuvwxyz";
+string util::charset::upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+string util::charset::alpha = lower + upper;
+string util::charset::num = "0123456789";
+string util::charset::alnum = alpha + num;
+
+static random_device rd{};
+static default_random_engine rengine{rd()};
+
 vector<string> util::split(string str, string on) {
 	vector<string> fields;
 	size_t idx = 0, m = 0;
@@ -71,5 +85,16 @@ string util::toOrdinal(long num) {
 			break;
 	}
 	return nums;
+}
+
+char util::randomCharacter(string set) {
+	uniform_int_distribution<int> udist(1, set.length());
+	return set[udist(rengine) - 1];
+}
+string util::randomString(long length, string set) {
+	string res; res.reserve(length);
+	for(int i = 0; i < length; ++i)
+		res += randomCharacter(set);
+	return res;
 }
 
