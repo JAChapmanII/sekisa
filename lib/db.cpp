@@ -56,6 +56,9 @@ void zidcu::Database::open(string fileName) {
 			+ sqlite3_errmsg(_db) + ": " + to_string(rc));
 	}
 }
+sqlite3_int64 zidcu::Database::lastInsertID() const {
+	return sqlite3_last_insert_rowid(_db);
+}
 
 zidcu::Statement &zidcu::Database::operator[](string sql) {
 	if(!_cache)

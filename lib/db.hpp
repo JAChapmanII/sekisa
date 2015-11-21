@@ -35,6 +35,8 @@ namespace zidcu {
 		template<typename... Ts>
 			void executeVoid(std::string sql, Ts... args);
 
+		sqlite_int64 lastInsertID() const;
+
 		private:
 			bool _opened{false};
 			std::string _fileName{};
