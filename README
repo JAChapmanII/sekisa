@@ -4,3 +4,5 @@ it was ripped straight from PINKSERV2, and has some out of date components.
 The history will probably be rewritten more depending on if other repositories
 such as zidcu and raku live, so I would not use it at this moment.
 
+Add -lPIC to Makefile.in for scrypt
+
