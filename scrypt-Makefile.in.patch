@@ -1,0 +1,12 @@
+--- Makefile.in	2015-08-08 14:45:12.000000000 -0400
++++ Makefile.in.post	2015-11-23 20:37:26.406283531 -0500
+@@ -373,7 +373,8 @@
+ 			-I $(srcdir)/lib/crypto			\
+ 			-I $(srcdir)/lib/scryptenc 		\
+ 			-I $(srcdir)/lib/util			\
+-			-I . -D CPUSUPPORT_CONFIG_FILE=\"cpusupport-config.h\"
++			-I . -D CPUSUPPORT_CONFIG_FILE=\"cpusupport-config.h\" \
++			-fPIC
+ 
+ scrypt_LDADD = -lcrypto libcperciva_aesni.a libscrypt_sse2.a
+ scrypt_man_MANS = scrypt.1

@@ -39,12 +39,20 @@ libsekisa.so: ${LIB}/*.cpp ${OBJS}
 web_ex: ${SRC}/web_ex.cpp ${OBJS}
 	${CXX} ${CXXFLAGS} -o ${BIN}/$@ $^ ${LDFLAGS}
 
-${OBJ}/%.o: ${LIB}/%.cpp
-	${CXX} ${CXXFLAGS} -fPIC -o $@ -c $^
+${OBJ}/%.o: ${LIB}/%.cpp ${SCRYPT}/config.h
+	${CXX} ${CXXFLAGS} -fPIC -o $@ -c $<
 
 
 # scrypt
-${SCRYPT}/config.h:
+${SCRYPT}.tgz:
+	wget https://www.tarsnap.com/scrypt/scrypt-1.2.0.tgz
+	# TODO; verify sha256 against sig
+
+${SCRYPT}: ${SCRYPT}.tgz
+	tar xf $<
+	cd ${SCRYPT} && patch < ../scrypt-Makefile.in.patch
+
+${SCRYPT}/config.h: ${SCRYPT}
 	cd ${SCRYPT} && ./configure && make
 
 ${OBJ}/scrypt-%.o: ${SCRYPT}/config.h
@@ -58,4 +66,8 @@ ${OBJ}/libscrypt%.o: ${SCRYPT}/config.h
 clean:
 	rm -f ${OBJ}/*.o ${BIN}/web_ex
 	cd ${SCRYPT} && make clean && rm config.h
+
+spotless: clean
+	rm -fr ${SCRYPT}
+	rm -fr ${SCRYPT}.tgz
 
