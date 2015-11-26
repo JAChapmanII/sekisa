@@ -46,7 +46,9 @@ ${OBJ}/%.o: ${LIB}/%.cpp ${SCRYPT}/config.h
 # scrypt
 ${SCRYPT}.tgz:
 	wget https://www.tarsnap.com/scrypt/scrypt-1.2.0.tgz
-	# TODO; verify sha256 against sig
+	gpg --verify scrypt-sigs-1.2.0.asc
+	bash -c "echo \"SHA256 ($@) = $$(sha256sum $@ | cut -d' ' -f1)\"" > $@.chksum
+	grep -f $@.chksum scrypt-sigs-1.2.0.asc
 
 ${SCRYPT}: ${SCRYPT}.tgz
 	tar xf $<
